@@ -12,7 +12,6 @@ books = [
     Book(3, "Fictional Book Title B", "A fantasy novel set in an 123 imaginary world.")
 ] 
 
-hello_world_bp = Blueprint("hello_world", __name__)
 books_bp = Blueprint("books", __name__, url_prefix="/books")
 
 @books_bp.route("", methods=["GET"])
@@ -25,6 +24,22 @@ def handle_books():
             "description": book.description
         })
     return jsonify(books_response), 200
+
+@books_bp.route("/<book_id>", methods=["GET"])
+def handle_book(book_id):
+    book_response = []
+    for book in books:
+        if book.id == int(book_id):
+            book_response = {
+                "id": book.id,
+                "title": book.title,
+                "description": book.description
+            }
+        return jsonify(book_response), 200
+
+
+
+hello_world_bp = Blueprint("hello_world", __name__)
 
 @hello_world_bp.route("/hello-world", methods=["GET"])
 def say_hello_world():
