@@ -20,7 +20,11 @@ def create_books():
     
 @books_bp.route("", methods=["GET"])
 def get_all_books():
-    books = Book.query.all()
+    title_query = request.args.get("title")
+    if title_query:
+        books = Book.query.filter_by(title=title_query)
+    else:
+        books = Book.query.all()
     book_result = []
     for book in books:
         book_result.append(
@@ -76,6 +80,22 @@ def delete_book(book_id):
     db.session.commit()
 
     return make_response(f"Book #{book.id} successfully deleted")
+
+
+
+# @books_bp.route("", methods=["GET"])
+# def get_all_books():
+#     books = Book.query.all()
+#     book_result = []
+#     for book in books:
+#         book_result.append(
+#             dict(
+#             id=book.id,
+#             title=book.title,
+#             description=book.description
+#             )
+#         )
+#     return jsonify(book_result), 200
 
 # from app import db
 # from app.models.book import Book
