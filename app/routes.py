@@ -1,6 +1,6 @@
 from app import db
 from app.models.book import Book
-from flask import Blueprint, jsonify, make_response, request
+from flask import Blueprint, jsonify, make_response, request, abort
 
 books_bp = Blueprint("books", __name__, url_prefix="/books")
 
@@ -30,7 +30,32 @@ def get_all_books():
             description=book.description
             )
         )
-    return jsonify(book_result)
+    return jsonify(book_result), 200
+
+def validate_book(book_id):
+    try:
+        book_id = int(book_id)
+    except:
+        abort(make_response({"message":f"book {book_id} invalid"}, 400))
+
+    book = Book.query.get(book_id)
+    
+    if not book:
+        abort(make_response({"message":f"book {book_id} not found"}, 404))
+    
+    return book
+
+@books_bp.route("/<book_id>", methods=["GET"])
+def handle_book(book_id):
+    book = validate_book(book_id)
+    book_response = {
+            "id": book.id,
+            "title": book.title,
+            "description": book.description
+        }
+    return jsonify(book_response), 200
+
+
 
 # from app import db
 # from app.models.book import Book
@@ -99,6 +124,11 @@ def get_all_books():
 #         "description": book.description
 #     }
 #     return jsonify(book_response), 200
+
+
+
+
+
 
 
 # hello_world_bp = Blueprint("hello_world", __name__)
